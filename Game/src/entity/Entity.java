@@ -5,9 +5,9 @@ import java.awt.image.BufferedImage;
 
 public class Entity {
 	
-	public double playerX, playerY;
+	public int worldX, worldY;
 	public int playerSize;
-	public double playerSpeed = 2;
+	public int playerSpeed;
 	
 	public int spriteNum = 1;
 	public int spriteCounter = 0;

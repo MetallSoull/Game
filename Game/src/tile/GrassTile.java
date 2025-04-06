@@ -11,22 +11,17 @@ public class GrassTile extends Tile {
 
     private static Game game;
     
-    public BufferedImage grassTile, tallGrass1, tallGrass2, flowers1, flowers2, rocks;
-    public int[][] mapTileNum;
-
-    public GrassTile(Game game) {
-    	super(new SpriteSheet(game.getSpriteSheet()).grabImage(1, 5, 16, 16));
-    	System.out.println("GrassTile loading image is " + (tileImage != null ? "successfull" : "failed "));
+    public BufferedImage tallGrass1, tallGrass2, flowers1, flowers2, rocks;
+    
+    public GrassTile(Game game, SpriteSheet ss) {
+    	super(ss.grabImage(1, 5, 16, 16));
+    	System.out.println("GrassTile loading image is " + (tileImage != null ? "successfull" : "Failed"));
     	this.game = game;
-        this.mapTileNum = new int[screenCol][screenRow]; 
-        
-        grassTile = tileImage;
-        getTile();
+
+        getTile(ss);
     }
 
-   public void getTile() {
-        SpriteSheet ss = new SpriteSheet(game.getSpriteSheet());
-        
+   public void getTile(SpriteSheet ss) {
         tallGrass1 = ss.grabImage(1, 6, 16, 16);
         tallGrass2 = ss.grabImage(2, 6, 16, 16);
         flowers1 = ss.grabImage(3, 6, 16, 16);
@@ -34,25 +29,24 @@ public class GrassTile extends Tile {
         rocks = ss.grabImage(5, 6, 16, 16);
     }
 
-    public void deco(int col, int row) {
-    	
+    public int deco(int col, int row) {
     	int chance = new Random().nextInt(100);
-    	if(chance < 40) {
-            int randDeco = new Random().nextInt(5) + 1; 
-            mapTileNum[col][row] = randDeco;
+    	if(chance < 50) {
+            return new Random().nextInt(5) + 1; 
         }
+    	return 0; 
     }
 
     @Override
     public void render(Graphics g, int xt, int yt) {
-    	g.drawImage(grassTile, xt, yt, tileSize, tileSize, null);
-    	
-        int decoration = mapTileNum[xt / tileSize][yt / tileSize];
-
-        if(decoration == 1) g.drawImage(tallGrass1, xt, yt, tileSize, tileSize, null);
-        else if(decoration == 2) g.drawImage(tallGrass2, xt, yt, tileSize, tileSize, null);   
-        else if(decoration == 3) g.drawImage(flowers1, xt, yt, tileSize, tileSize, null);   
-        else if(decoration == 4) g.drawImage(flowers2, xt, yt, tileSize, tileSize, null);   
-        else if(decoration == 5) g.drawImage(rocks, xt, yt, tileSize, tileSize, null);   
+    	g.drawImage(tileImage, xt, yt, tileSize, tileSize, null);
+    }
+    
+    public void renderDeco(Graphics g, int xt, int yt, int decoType) {
+    	if(decoType == 1) g.drawImage(tallGrass1, xt, yt, tileSize, tileSize, null);
+    	if(decoType == 2) g.drawImage(tallGrass2, xt, yt, tileSize, tileSize, null);
+    	if(decoType == 3) g.drawImage(flowers1, xt, yt, tileSize, tileSize, null);
+    	if(decoType == 4) g.drawImage(flowers2, xt, yt, tileSize, tileSize, null);
+    	if(decoType == 5) g.drawImage(rocks, xt, yt, tileSize, tileSize, null);
     }
 }

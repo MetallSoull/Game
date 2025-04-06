@@ -8,30 +8,26 @@ import gfx.SpriteSheet;
 import main.Game;
 
 public class WaterTile extends Tile{
-	
-	private static Game game;
-	
+		
 	public BufferedImage[] updatingWater;
 	private Random random = new Random();
 	
 	private int currentFrames = 0;
 	private int tickCounter = 0;
-
-	public boolean collision;
 	
-	public WaterTile(Game game) {
+	public WaterTile(Game game, SpriteSheet ss) {
 		super(new SpriteSheet(game.getSpriteSheet()).grabImage(1, 4, 16, 16));
 		System.out.println("WaterTile loading image is " + (tileImage != null ? "Successfull" : "Failed"));
     	this.game = game;
+    	
+    	collision = true;
 		
 		updatingWater = new BufferedImage[3];
 		
-		getTile();
+		getTile(ss);
 	}
 	
-	public void getTile() {
-		SpriteSheet ss = new SpriteSheet(game.getSpriteSheet());
-		
+	public void getTile(SpriteSheet ss) {
 		updatingWater[0] = ss.grabImage(1, 4, 16, 16);
 		updatingWater[1] = ss.grabImage(2, 4, 16, 16);
 		updatingWater[2] = ss.grabImage(3, 4, 16, 16);
@@ -39,8 +35,11 @@ public class WaterTile extends Tile{
 	
 	public void tick() {
 		tickCounter++;
-		if(tickCounter % 30 == 0) {
-			currentFrames = (currentFrames + 1) % updatingWater.length; 
+		int chance = random.nextInt(100);
+		if(chance < 50) {
+		    if(tickCounter % 30 == 0) {
+			    currentFrames = (currentFrames + 1) % updatingWater.length; 
+		    }
 		}
 	}
 	

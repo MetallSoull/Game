@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -33,13 +34,17 @@ public class Game extends Canvas implements Runnable {
 	public TileManager tileM;
 	public Player player;
 	
+	public Game() {
+		setMinimumSize(new Dimension(WIDTH, HEIGHT));
+		setMaximumSize(new Dimension(WIDTH, HEIGHT));
+		setPreferredSize(new Dimension(WIDTH, HEIGHT));
+	}
+	
 	public void init() throws IOException{
 		ImageLoader loader = new ImageLoader();
 		spriteSheet = loader.loadImage("/sheet/icons.png");
-		SpriteSheet spriteS = new SpriteSheet(spriteSheet);
-		
 		player = new Player(this, keyH);
-		tileM = new TileManager(this);
+		tileM = new TileManager(this, player);
 	}
 	
 	public void start() {
@@ -100,8 +105,8 @@ public class Game extends Canvas implements Runnable {
 	}
 
 	private void tick() {
-		tileM.tick();
 		player.tick();
+		tileM.tick();
 	}
 	
 	private void render() {
@@ -130,14 +135,14 @@ public class Game extends Canvas implements Runnable {
 	public static void main(String args[]) {
 		
 		Game game = new Game();
-		game.setMinimumSize(new Dimension(WIDTH, HEIGHT));
-		game.setMaximumSize(new Dimension(WIDTH, HEIGHT));
-		game.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		
 		JFrame frame = new JFrame();
 		frame.setTitle(NAME);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(game);
+		CenterPanel centerPanel = new CenterPanel();	
+		centerPanel.add(game);
+		frame.setLayout(new BorderLayout());
+		frame.add(centerPanel, BorderLayout.CENTER);
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);

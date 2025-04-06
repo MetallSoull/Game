@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import gfx.SpriteSheet;
 import main.Game;
 import main.KeyHandler;
+import tile.Tile;
 
 public class Player extends Entity {
 
@@ -15,16 +16,23 @@ public class Player extends Entity {
 	private KeyHandler keyH;
 	
 	public BufferedImage image = null;
+	
+	public final int screenX, screenY;
 
 	public Player(Game game, KeyHandler keyH) {
 		this.game = game;
 		this.keyH = keyH;
+		
+		screenX = (game.WIDTH / 2) - (Tile.tileSize / 2);
+		screenY = (game.HEIGHT / 2) - (Tile.tileSize / 2);
 		
 		solidArea = new Rectangle(0, 0, playerSize, playerSize);
 		solidArea.x = 8;
 		solidArea.y = 16;
 		solidArea.width = solidArea.y * 2;
 		solidArea.height = solidArea.y * 2;
+		
+		playerSpeed = 2;
 		
 		getSprites();
 		setDefaultValues();
@@ -46,8 +54,8 @@ public class Player extends Entity {
 	public void setDefaultValues() {
 		playerSize = 48;
 		
-		playerX = (game.WIDTH / 2) - (playerSize / 2);
-		playerY = (game.HEIGHT / 2) - (playerSize / 2);
+		worldX = ((50 * Tile.tileSize) / 2) - 48 - 48;
+		worldY = (Tile.tileSize * 22) - 48;
 		
 		direction = "down";
 	}
@@ -55,51 +63,19 @@ public class Player extends Entity {
 	public void tick() {
 		if(keyH.up) { 
 			direction = "up";
-			playerY-=playerSpeed;
-			if(keyH.right) {
-				playerX -= 0.2;
-				playerY += 0.2;
-			}
-			if(keyH.left) {
-				playerX += 0.2;
-				playerY += 0.2;
-			}
-			if(playerY < -playerSize) {
-				playerY = game.HEIGHT;
-			}
-			System.out.println(playerY);
+			worldY -= playerSpeed;
 		}
 		if(keyH.down) { 
 			direction = "down";
-			playerY+=playerSpeed;
-			if(keyH.right) {
-				playerX -= 0.2;
-				playerY -= 0.2;
-			}
-			if(keyH.left) {
-				playerX += 0.2;
-				playerY -= 0.2;
-			}
-			if(playerY > game.HEIGHT) {
-				playerY = -playerSize;
-			}
-			System.out.println(playerY);
+			worldY += playerSpeed;
 		}
 		if(keyH.right) { 
 			direction = "right";
-			playerX+=playerSpeed;
-			if(playerX > game.WIDTH) {
-				playerX = -playerSize;
-			}
-			System.out.println(playerX);
+			worldX += playerSpeed;
 		}
 		if(keyH.left) { 
 			direction = "left";
-			playerX-=playerSpeed;
-			if(playerX < -playerSize) {
-				playerX = game.WIDTH;
-			}
-			System.out.println(playerX);
+			worldX -= playerSpeed;
 		}
 		
 		spriteCounter++;
@@ -129,6 +105,6 @@ public class Player extends Entity {
 			if(spriteNum == 2) image = slime1;
 		}
 		
-		g.drawImage(image, (int)playerX, (int)playerY, playerSize, playerSize, null);
+		g.drawImage(image, screenX, screenY, playerSize, playerSize, null);
 	}
 }

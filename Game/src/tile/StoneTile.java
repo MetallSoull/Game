@@ -7,20 +7,17 @@ import gfx.SpriteSheet;
 import main.Game;
 
 public class StoneTile extends Tile {
-	
-	private static Game game;
-	private BufferedImage stoneTile;
-	
-	public boolean collision;
-	
+		
 	public StoneTile(Game game) {
 		super(new SpriteSheet(game.getSpriteSheet()).grabImage(2, 5, 16, 16));        
 		System.out.println("StoneTile loading image is " + (tileImage != null ? "successfull" : "Failed"));
-		stoneTile = tileImage;
-    }
+		this.game = game;
+		
+		collision = true;
+	 }
 	
 	@Override
 	public void render(Graphics g, int xt, int yt) {	
-		 g.drawImage(stoneTile, xt, yt, tileSize, tileSize, null);
+		 g.drawImage(tileImage, xt, yt, tileSize, tileSize, null);
 	}
 }

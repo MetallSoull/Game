@@ -8,9 +8,9 @@ import main.Game;
 
 public class Tile {
 	
-	private Game game;
+	protected Game game;
 	
-	public static BufferedImage tileImage;
+	public BufferedImage tileImage;
 	
 	public boolean collision;
 	
@@ -24,13 +24,10 @@ public class Tile {
 	}
 	
 	public void render(Graphics g, int xt, int yt) {
-		if(tileImage != null) {
-			g.drawImage(tileImage, xt, yt, tileSize, tileSize, null);
-		}
+		g.drawImage(tileImage, xt, yt, tileSize, tileSize, null);
 	}
 	
 	public void tick() {
-		
 		
 	}
 }
