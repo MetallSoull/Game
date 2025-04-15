@@ -73,7 +73,7 @@ public class Mob extends Entity {
 			} 
 		}
 
-		direction = "down";
+		direction = random.nextInt(4)+1;
 	}
 
 	public Rectangle getSolidArea() {
@@ -85,13 +85,13 @@ public class Mob extends Entity {
 		int ya = 0;
 
 		if (xa > 0)
-			direction = "right";
+			dir = 3;
 		else if (xa < 0)
-			direction = "left";
+			dir = 4;
 		else if (ya < 0)
-			direction = "up";
+			dir = 1;
 		else if (ya > 0)
-			direction = "down";
+			dir = 2;
 
 		moveTimer++;
 
@@ -101,25 +101,25 @@ public class Mob extends Entity {
 			if (chance < 50) {
 				int action = random.nextInt(4);
 				if (action == 0)
-					direction = "up";
+					dir = 1;
 				if (action == 1)
-					direction = "down";
+					dir = 2;
 				if (action == 2)
-					direction = "left";
+					dir = 4;
 				if (action == 3)
-					direction = "right";
+					dir = 3;
 			}
 		}
 
 		if (direction != null) {
 
-			if (direction.equals("up"))
+			if (dir==1)
 				ya--;
-			if (direction.equals("down"))
+			if (dir==2)
 				ya++;
-			if (direction.equals("right"))
+			if (dir==3)
 				xa++;
-			if (direction.equals("left"))
+			if (dir==4)
 				xa--;
 
 			int moveSpeed = playerSpeed;
@@ -141,13 +141,13 @@ public class Mob extends Entity {
 					moveTimer = 0;
 					int action = random.nextInt(4);
 					if (action == 0)
-						direction = "up";
-					if (action == 1)
-						direction = "down";
-					if (action == 2)
-						direction = "left";
-					if (action == 3)
-						direction = "right";
+					dir = 1;
+				if (action == 1)
+					dir = 2;
+				if (action == 2)
+					dir = 4;
+				if (action == 3)
+					dir = 3;
 				}
 			}
 
@@ -167,25 +167,25 @@ public class Mob extends Entity {
 
 			g.drawImage(image, screenX, screenY, playerSize, playerSize, null);
 
-			if (direction.equals("down")) {
+			if (dir==2) {
 				if (spriteNum == 1)
 					image = playerSprite[0];
 				if (spriteNum == 2)
 					image = playerSprite[1];
 			}
-			if (direction.equals("up")) {
+			if (dir==1) {
 				if (spriteNum == 1)
 					image = playerSprite[2];
 				if (spriteNum == 2)
 					image = playerSprite[3];
 			}
-			if (direction.equals("right")) {
+			if (dir==3)) {
 				if (spriteNum == 1)
 					image = playerSprite[4];
 				if (spriteNum == 2)
 					image = playerSprite[5];
 			}
-			if (direction.equals("left")) {
+			if (dir==4) {
 				if (spriteNum == 1)
 					image = playerSprite[6];
 				if (spriteNum == 2)
