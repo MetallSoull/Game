@@ -35,7 +35,7 @@ public class Entity {
 	public boolean collisionOn;
 	public Rectangle solidArea;
 
-	public String direction;
+	public int dir;
 
 	public BufferedImage[] playerSprite = new BufferedImage[8];
 	public BufferedImage[] attackParticle = new BufferedImage[8];
