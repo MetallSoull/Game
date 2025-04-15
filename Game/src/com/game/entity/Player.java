@@ -62,7 +62,7 @@ public class Player extends Entity {
 		levelX = Tile.tileSize * 20;
 		levelY = Tile.tileSize * 20;
 		playerSpeed = 2;
-		direction = "down";
+		dir = random.nextInt(4)+1;
 	}
 
 	public Rectangle getSolidArea() {
@@ -81,20 +81,20 @@ public class Player extends Entity {
 		int ya = 0;
 
 		if (xa > 0)
-			direction = "right";
+			dir = 3;
 		else if (xa < 0)
-			direction = "left";
+			dir = 4;
 		else if (ya < 0)
-			direction = "up";
+			dir = 1;
 		else if (ya > 0)
-			direction = "down";
+			dir = 2;
 		else if (attack)
 			action = "attack";
 
 		if (movingLeft) {
 			xa--;
 			moving = true;
-			direction = "left";
+			dir = 4;
 			if (attack) {
 				attackOn = true;
 				action = "attack";
@@ -103,7 +103,7 @@ public class Player extends Entity {
 		} else if (movingRight) {
 			xa++;
 			moving = true;
-			direction = "right";
+			dir = 3;
 			if (attack) {
 				attackOn = true;
 				action = "attack";
@@ -114,7 +114,7 @@ public class Player extends Entity {
 		if (movingUp) {
 			ya--;
 			moving = true;
-			direction = "up";
+			dir = 1;
 			if (attack) {
 				attackOn = true;
 				action = "attack";
@@ -123,7 +123,7 @@ public class Player extends Entity {
 		} else if (movingDown) {
 			ya++;
 			moving = true;
-			direction = "down";
+			dir = 2;
 			if (attack) {
 				attackOn = true;
 				action = "attack";
@@ -175,7 +175,7 @@ public class Player extends Entity {
 
 	public void render(Graphics g) {
 		g.drawImage(image, screenX, screenY, playerSize, playerSize, null);
-		if (direction.equals("up")) {
+		if (dir==1) {
 			if (spriteNum == 1)
 				image = playerSprite[0];
 			if (spriteNum == 2)
@@ -186,7 +186,7 @@ public class Player extends Entity {
 			}
 		}
 
-		if (direction.equals("down")) {
+		if (dir==2) {
 			if (spriteNum == 1)
 				image = playerSprite[1];
 			if (spriteNum == 2)
@@ -197,7 +197,7 @@ public class Player extends Entity {
 			}
 		}
 
-		if (direction.equals("left")) {
+		if (dir==4) {
 			if (spriteNum == 1)
 				image = playerSprite[2];
 			if (spriteNum == 2)
@@ -210,7 +210,7 @@ public class Player extends Entity {
 			}
 		}
 
-		if (direction.equals("right")) {
+		if (dir==3) {
 			if (spriteNum == 1)
 				image = playerSprite[3];
 			if (spriteNum == 2)
