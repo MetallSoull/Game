@@ -12,6 +12,7 @@ Stay on track. Tasks now getting pretty tought to make and understand. Basically
 
 [19.04.25]
 Finally get to work and FINALLY made those camera borders. A little bit of explanation - when player camera reaches the border of the map, It will stop following the player, and player camera will go free. So, now here is the next tasks for future:
+
 Bugs:
 Fix every bug that actually interrupting player's gameplay or game's optimization.
 Some of those: 
