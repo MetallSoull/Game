@@ -12,20 +12,14 @@ Stay on track. Tasks now getting pretty tought to make and understand. Basically
 
 [19.04.25]
 Finally get to work and FINALLY made those camera borders. A little bit of explanation - when player camera reaches the border of the map, It will stop following the player, and player camera will go free. So, now here is the next tasks for future:
-====
-Bugs
-====
-
+Bugs:
 Fix every bug that actually interrupting player's gameplay or game's optimization.
 Some of those: 
 1. When player collide with mob while he is moving, seems like player not actually goes with him normally and he just slows the players movement (of course, the main problem is in reverting movement when player collide with entities)
 2. Actually, we are setting up a new variable that randomize the mob spawning. Of course, they doesn't spawn on solid blocks like water, tree and so on. Basically, seems like, that we are setting levelX to tile size and only after checking that the entity is not in tree, water or in the player itself we are setting levelX to randomX variable, that chooses random tile on the whole level map. However, seems like, they actually spawning in 48 by 48 tile at the start of the map, which actually ruins the optimization in game.
 3. Sometimes, entities can spawn on each other, that, actually, also interrupting game's optimization.
 
-====================
-To do in future list
-====================
-
+To do in future list:
 1. Map generation by using Diamond-square algorithm
 2. Attack implementation for the player
 3. Damage receiving from the cactuses or other entities, when they collide the player
