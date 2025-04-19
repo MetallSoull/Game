@@ -17,8 +17,12 @@ public class Player extends Entity {
 	private KeyHandler keyH;
 	public BufferedImage image = null;
 
-	public static int screenX;
-	public static int screenY;
+	public int screenX;
+	public int screenY;
+	public int cameraX;
+	public int cameraY;
+
+	private Random random = new Random();
 
 	public Player(Game game, KeyHandler keyH) {
 		super(game);
@@ -62,7 +66,7 @@ public class Player extends Entity {
 		levelX = Tile.tileSize * 20;
 		levelY = Tile.tileSize * 20;
 		playerSpeed = 2;
-		dir = random.nextInt(4)+1;
+		dir = random.nextInt(4) + 1;
 	}
 
 	public Rectangle getSolidArea() {
@@ -70,6 +74,11 @@ public class Player extends Entity {
 	}
 
 	public void tick() {
+		if (cameraX == 0 && cameraY == 0) {
+			cameraX = levelX - screenX;
+			cameraY = levelY - screenY;
+		}
+
 		boolean movingUp = keyH.up;
 		boolean movingDown = keyH.down;
 		boolean movingLeft = keyH.left;
@@ -156,6 +165,29 @@ public class Player extends Entity {
 			if (!collisionOn) {
 				levelY = nextY;
 			}
+			
+			if(levelX < -15) {
+				levelX = -15;
+			}
+			if(levelY < -15) {
+				levelY = -15;
+			}
+
+			cameraX = levelX - screenX;
+			cameraY = levelY - screenY;
+
+			if (cameraX < 0)
+				cameraX = 0;
+			if (cameraY < 0)
+				cameraY = 0;
+
+			int maxCamX = game.tileM.maxLevelCol * Tile.tileSize - game.WIDTH;
+			int maxCamY = game.tileM.maxLevelRow * Tile.tileSize - game.HEIGHT;
+
+			if (cameraX > maxCamX)
+				cameraX = maxCamX;
+			if (cameraY > maxCamY)
+				cameraY = maxCamY;
 
 			spriteCounter++;
 			if (spriteCounter % 20 == 0) {
@@ -174,53 +206,36 @@ public class Player extends Entity {
 	}
 
 	public void render(Graphics g) {
-		g.drawImage(image, screenX, screenY, playerSize, playerSize, null);
-		if (dir==1) {
+		int drawX = levelX - cameraX;
+		int drawY = levelY - cameraY;
+
+		g.drawImage(image, drawX, drawY, playerSize, playerSize, null);
+		if (dir == 1) {
 			if (spriteNum == 1)
 				image = playerSprite[0];
 			if (spriteNum == 2)
 				image = playerSprite[4];
-			if (action.equals("attack")) {
-				attack();
-				g.drawImage(attackParticle[2], screenX + 4, screenY - 15, 40, 40, null);
-			}
 		}
 
-		if (dir==2) {
+		if (dir == 2) {
 			if (spriteNum == 1)
 				image = playerSprite[1];
 			if (spriteNum == 2)
 				image = playerSprite[5];
-			if (action.equals("attack")) {
-				attack();
-				g.drawImage(attackParticle[3], screenX + 4, screenY + 17, 40, 40, null);
-			}
 		}
 
-		if (dir==4) {
+		if (dir == 4) {
 			if (spriteNum == 1)
 				image = playerSprite[2];
 			if (spriteNum == 2)
 				image = playerSprite[6];
-			if (direction.equals("right"))
-				image = playerSprite[3];
-			if (action.equals("attack")) {
-				attack();
-				g.drawImage(attackParticle[0], screenX - 8, screenY + 2, 40, 40, null);
-			}
 		}
 
-		if (dir==3) {
+		if (dir == 3) {
 			if (spriteNum == 1)
 				image = playerSprite[3];
 			if (spriteNum == 2)
 				image = playerSprite[7];
-			if (direction.equals("left"))
-				image = playerSprite[3];
-			if (action.equals("attack")) {
-				attack();
-				g.drawImage(attackParticle[1], screenX + 16, screenY + 2, 40, 40, null);
-			}
 		}
 	}
 }

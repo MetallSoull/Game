@@ -68,7 +68,6 @@ public class CollisionChecker {
         int entityGridX = nextSolidArea.x / game.gridCellSize;
         int entityGridY = nextSolidArea.y / game.gridCellSize;
 
-        // Check the current cell and adjacent cells
         for (int x = entityGridX - 1; x <= entityGridX + 1; x++) {
             for (int y = entityGridY - 1; y <= entityGridY + 1; y++) {
                 if (x >= 0 && x < game.entityGrid.length && y >= 0 && y < game.entityGrid[x].length) {

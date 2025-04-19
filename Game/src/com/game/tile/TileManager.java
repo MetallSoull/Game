@@ -29,9 +29,9 @@ public class TileManager {
 
 	public int[][] mapTileNum;
 	public int[][] grassDecoMap;
-	
+
 	public int xScroll, yScroll;
-	
+
 	public TileManager(Game game, Player player) {
 		this.game = game;
 		this.player = player;
@@ -144,26 +144,20 @@ public class TileManager {
 				t.tick();
 			}
 		}
-		
-		xScroll = Math.max(player.levelX - game.WIDTH / 2, 0);
-		xScroll = Math.min(xScroll, (maxLevelCol * Tile.tileSize) - game.WIDTH);
-		
-		yScroll = Math.max(player.levelY - game.HEIGHT / 2, 0);
-		xScroll = Math.min(yScroll, (maxLevelRow * Tile.tileSize) - game.HEIGHT);
-		
 	}
 
-	public void render(Graphics g) {		
+	public void render(Graphics g) {
 		for (int col = 0; col < maxLevelCol; col++) {
 			for (int row = 0; row < maxLevelRow; row++) {
 				int tileNum = mapTileNum[col][row];
 
 				int levelX = col * Tile.tileSize;
 				int levelY = row * Tile.tileSize;
-				int screenX = levelX - player.levelX + player.screenX;
-				int screenY = levelY - player.levelY + player.screenY;
-                if (screenX + Tile.tileSize > -Tile.tileSize && screenX < game.WIDTH + Tile.tileSize &&
-                    screenY + Tile.tileSize > -Tile.tileSize && screenY < game.HEIGHT + Tile.tileSize) {
+				int screenX = levelX - player.cameraX;
+				int screenY = levelY - player.cameraY;
+
+				if (screenX + Tile.tileSize > -Tile.tileSize && screenX < game.WIDTH + Tile.tileSize
+						&& screenY + Tile.tileSize > -Tile.tileSize && screenY < game.HEIGHT + Tile.tileSize) {
 
 					if (tileNum >= 0 && tileNum < tile.length && tile[tileNum] != null) {
 						g.drawImage(tile[tileNum].tileImage, screenX, screenY, Tile.tileSize, Tile.tileSize, null);
@@ -178,7 +172,6 @@ public class TileManager {
 						}
 					}
 				}
-
 			}
 		}
 	}

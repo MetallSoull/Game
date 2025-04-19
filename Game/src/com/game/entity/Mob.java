@@ -1,5 +1,6 @@
 package com.game.entity;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -18,6 +19,8 @@ public class Mob extends Entity {
 	private Game game;
 	private int moveTimer = 0;
 	private int moveInterval = 50;
+	
+	private Rectangle nextRect;
 
 	public Mob(Game game) {
 		super(game);
@@ -73,7 +76,7 @@ public class Mob extends Entity {
 			} 
 		}
 
-		direction = random.nextInt(4)+1;
+		dir = random.nextInt(4)+1;
 	}
 
 	public Rectangle getSolidArea() {
@@ -111,7 +114,7 @@ public class Mob extends Entity {
 			}
 		}
 
-		if (direction != null) {
+		if (dir != 0) {
 
 			if (dir==1)
 				ya--;
@@ -124,7 +127,7 @@ public class Mob extends Entity {
 
 			int moveSpeed = playerSpeed;
 
-			Rectangle nextRect = new Rectangle(levelX + solidArea.x + xa * moveSpeed,
+			nextRect = new Rectangle(levelX + solidArea.x + xa * moveSpeed,
 					levelY + solidArea.y + ya * moveSpeed, solidArea.width, solidArea.height);
 
 			collisionOn = false;
@@ -159,9 +162,8 @@ public class Mob extends Entity {
 	}
 
 	public void render(Graphics g) {
-		int screenX = levelX - game.player.levelX + Player.screenX;
-		int screenY = levelY - game.player.levelY + Player.screenY;
-
+		int screenX = levelX - game.player.cameraX;
+		int screenY = levelY - game.player.cameraY;
 		if (screenX + playerSize > -Tile.tileSize && screenX < game.WIDTH + Tile.tileSize
 				&& screenY + playerSize > -Tile.tileSize && screenY < game.HEIGHT + Tile.tileSize) {
 
@@ -179,7 +181,7 @@ public class Mob extends Entity {
 				if (spriteNum == 2)
 					image = playerSprite[3];
 			}
-			if (dir==3)) {
+			if (dir==3) {
 				if (spriteNum == 1)
 					image = playerSprite[4];
 				if (spriteNum == 2)
