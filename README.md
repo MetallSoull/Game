@@ -26,3 +26,6 @@ To do in future list:
 3. Damage receiving from the cactuses or other entities, when they collide the player
 
 Probably, that is all for today, keep working and trying to learn something while doing this stuff. I hope, It works and I'm ACTUALLY learning
+
+[20.04.25] 
+So, fixed two of the provided above bugs. Now, I need to focus on my goals, so that I can learn a lot of new stuff again here. KEEP ON TRACK!!11!!!11!!
