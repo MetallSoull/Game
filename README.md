@@ -29,3 +29,6 @@ Probably, that is all for today, keep working and trying to learn something whil
 
 [20.04.25] 
 So, fixed two of the provided above bugs. Now, I need to focus on my goals, so that I can learn a lot of new stuff again here. KEEP ON TRACK!!11!!!11!!
+
+[22.11.25]
+Got back to the game after a very long period of inactivity. Now, current state of the game looks like this. I finally implemented random map generation by perlin noise and diamond-square alghoritm. See ya!
