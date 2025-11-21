@@ -5,96 +5,54 @@ import java.util.List;
 
 import com.game.entity.Entity;
 import com.game.main.Game;
+import com.main.level.Level;
 
 public class CollisionChecker {
 
-    Game game;
+    private Game game;
 
     public CollisionChecker(Game game) {
         this.game = game;
     }
 
-    public void checkTile(Entity entity) {
+    public void checkTile(Entity e) {
 
-        int entityLeftCol = (entity.levelX + entity.solidArea.x) / Tile.tileSize;
-        int entityRightCol = (entity.levelX + entity.solidArea.x + entity.solidArea.width) / Tile.tileSize;
-        int entityTopRow = (entity.levelY + entity.solidArea.y) / Tile.tileSize;
-        int entityBottomRow = (entity.levelY + entity.solidArea.y + entity.solidArea.height) / Tile.tileSize;
+        Rectangle r = e.getSolidArea();
+        int futureX = e.levelX + e.xa * e.playerSpeed;
+        int futureY = e.levelY + e.ya * e.playerSpeed;
 
-        int tileNum1, tileNum2;
+        checkTileCorner(e, futureX + r.x, futureY + r.y);
+        checkTileCorner(e, futureX + r.x + r.width, futureY + r.y);
+        checkTileCorner(e, futureX + r.x, futureY + r.y + r.height);
+        checkTileCorner(e, futureX + r.x + r.width, futureY + r.y + r.height);
+    }
 
-        try {
-            tileNum1 = game.tileM.mapTileNum[entityLeftCol][entityTopRow];
-            tileNum2 = game.tileM.mapTileNum[entityRightCol][entityTopRow];
-            if (game.tileM.tile[tileNum1].collision || game.tileM.tile[tileNum2].collision) {
-                entity.collisionOn = true;
-            }
-            tileNum1 = game.tileM.mapTileNum[entityLeftCol][entityBottomRow];
-            tileNum2 = game.tileM.mapTileNum[entityRightCol][entityBottomRow];
-            if (game.tileM.tile[tileNum1].collision || game.tileM.tile[tileNum2].collision) {
-                entity.collisionOn = true;
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            entity.collisionOn = true;
+    private void checkTileCorner(Entity e, int px, int py) {
+        int tileX = px / Tile.tileSize;
+        int tileY = py / Tile.tileSize;
+
+        if (tileX < 0 || tileY < 0 || tileX >= game.level.w || tileY >= game.level.h) {
+            e.collisionOn = true;
+            return;
+        }
+
+        int tileId = game.level.getTile(tileX, tileY);
+
+        if (!game.tileM.tile[tileId].mayPass()) {
+            e.collisionOn = true;
         }
     }
 
-    public void overloadedCheckTile(Entity entity, Rectangle nextSolidArea) {
+    public void checkEntity(Entity self, List<Entity> entities, Rectangle nextRect) {
+        for (Entity other : entities) {
+            if (other == self) continue;
+            if (other.dead) continue;
 
-        int nextLeftCol = (nextSolidArea.x) / Tile.tileSize;
-        int nextRightCol = (nextSolidArea.x + nextSolidArea.width) / Tile.tileSize;
-        int nextTopRow = (nextSolidArea.y) / Tile.tileSize;
-        int nextBottomRow = (nextSolidArea.y + nextSolidArea.height) / Tile.tileSize;
+            Rectangle r = other.getSolidArea();
 
-        int tileNum1, tileNum2;
-
-        try {
-            tileNum1 = game.tileM.mapTileNum[nextLeftCol][nextTopRow];
-            tileNum2 = game.tileM.mapTileNum[nextRightCol][nextTopRow];
-            if (game.tileM.tile[tileNum1].collision || game.tileM.tile[tileNum2].collision) {
-                entity.collisionOn = true;
-            }
-            tileNum1 = game.tileM.mapTileNum[nextLeftCol][nextBottomRow];
-            tileNum2 = game.tileM.mapTileNum[nextRightCol][nextBottomRow];
-            if (game.tileM.tile[tileNum1].collision || game.tileM.tile[tileNum2].collision) {
-                entity.collisionOn = true;
-            }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            entity.collisionOn = true;
-        }
-    }
-
-    public void checkEntity(Entity entity, List<Entity> target, Rectangle nextSolidArea) {
-        int entityGridX = nextSolidArea.x / game.gridCellSize;
-        int entityGridY = nextSolidArea.y / game.gridCellSize;
-
-        for (int x = entityGridX - 1; x <= entityGridX + 1; x++) {
-            for (int y = entityGridY - 1; y <= entityGridY + 1; y++) {
-                if (x >= 0 && x < game.entityGrid.length && y >= 0 && y < game.entityGrid[x].length) {
-                    List<Entity> possibleColliders = game.entityGrid[x][y];
-                    for (Entity otherEntity : possibleColliders) {
-                        if (otherEntity != entity) {
-
-                            // Predict the future rectangle of the moving entity
-                            int predictedX = otherEntity.levelX + otherEntity.xa * otherEntity.playerSpeed;
-                            int predictedY = otherEntity.levelY + otherEntity.ya * otherEntity.playerSpeed;
-
-                            Rectangle targetSolidArea = new Rectangle(
-                                predictedX + otherEntity.solidArea.x + 1,
-                                predictedY + otherEntity.solidArea.y + 1,
-                                otherEntity.solidArea.width - 2,
-                                otherEntity.solidArea.height - 2
-                            );
-
-                            if (nextSolidArea.intersects(targetSolidArea)) {
-                                entity.collisionOn = true;
-                                entity.collidedEntity = otherEntity;
-                                otherEntity.collidedEntity = entity;
-                                return; 
-                            }
-                        }
-                    }
-                }
+            if (nextRect.intersects(r)) {
+                self.collisionOn = true;
+                return;
             }
         }
     }

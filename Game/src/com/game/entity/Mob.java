@@ -19,7 +19,7 @@ public class Mob extends Entity {
 	private Game game;
 	private int moveTimer = 0;
 	private int moveInterval = 50;
-	
+
 	private Rectangle nextRect;
 
 	public Mob(Game game) {
@@ -54,60 +54,70 @@ public class Mob extends Entity {
 	public void setDefaultValues() {
 		playerSize = 48;
 		playerSpeed = 1;
+		health = 10;
 
 		int randomX, randomY, tileNum;
 		boolean validSpawn = false;
 
-		// Keep trying until we find a valid, non-overlapping spot
+		detectedEntityOX = game.player.levelX + (levelX - (playerSize / 2));
+		detectedEntityOY = game.player.levelY + (levelY - (playerSize / 2));
+
 		while (!validSpawn) {
-			randomX = random.nextInt(game.tileM.maxLevelCol) * Tile.tileSize;
-			randomY = random.nextInt(game.tileM.maxLevelRow) * Tile.tileSize;
+			randomX = random.nextInt(game.level.w) * Tile.tileSize;
+			randomY = random.nextInt(game.level.h) * Tile.tileSize;
 
 			int mobLeftCol = randomX / Tile.tileSize;
 			int mobTopRow = randomY / Tile.tileSize;
 
-			// Check tile collision (your original part)
-			if (mobLeftCol >= 0 && mobLeftCol < game.tileM.maxLevelCol &&
-				mobTopRow >= 0 && mobTopRow < game.tileM.maxLevelRow) {
+			if (mobLeftCol >= 0 && mobLeftCol < game.level.w && mobTopRow >= 0 && mobTopRow < game.tileM.game.level.h) {
+				mobLeftCol = Math.max(0, Math.min(mobLeftCol, game.level.w - 1));
+				mobTopRow = Math.max(0, Math.min(mobTopRow, game.level.h - 1));
 
-				tileNum = game.tileM.mapTileNum[mobLeftCol][mobTopRow];
+				tileNum = game.level.tiles[mobLeftCol][mobTopRow];
 
-				if (!game.tileM.tile[tileNum].collision) {
-					Rectangle spawnRect = new Rectangle(
-						randomX + solidArea.x,
-						randomY + solidArea.y,
-						solidArea.width,
-						solidArea.height
-					);
+				if (tileNum >= 0 && tileNum < game.tileM.tile.length) {
+					if (!game.tileM.tile[tileNum].collision) {
+						Rectangle spawnRect = new Rectangle(randomX + solidArea.x, randomY + solidArea.y,
+								solidArea.width, solidArea.height);
 
-					boolean overlap = false;
+						boolean overlap = false;
 
-					for (Entity entity : game.entities) {
-						if (entity == this) continue;  // Skip self
+						for (Entity entity : game.entities) {
+							if (entity == this)
+								continue;
 
-						Rectangle entityRect = new Rectangle(
-							entity.levelX + entity.solidArea.x,
-							entity.levelY + entity.solidArea.y,
-							entity.solidArea.width,
-							entity.solidArea.height
-						);
+							Rectangle entityRect = new Rectangle(entity.levelX + entity.solidArea.x,
+									entity.levelY + entity.solidArea.y, entity.solidArea.width,
+									entity.solidArea.height);
 
-						if (spawnRect.intersects(entityRect)) {
-							overlap = true;
-							break;
+							if (spawnRect.intersects(entityRect)) {
+								overlap = true;
+								break;
+							}
 						}
-					}
 
-					if (!overlap) {
-						levelX = randomX;
-						levelY = randomY;
-						validSpawn = true;
+						if (!overlap) {
+							levelX = randomX;
+							levelY = randomY;
+							validSpawn = true;
+						}
 					}
 				}
 			}
 		}
 
 		dir = random.nextInt(4) + 1;
+	}
+
+	public void hurt(int damage) {
+		health -= damage;
+		if (health <= 0) {
+			die();
+		}
+	}
+
+	public void die() {
+		dead = true;
 	}
 
 	public Rectangle getSolidArea() {
@@ -132,8 +142,8 @@ public class Mob extends Entity {
 		if (moveTimer >= moveInterval) {
 			moveTimer = 0;
 			int chance = random.nextInt(100);
-			if (chance < 50) {
-				int action = random.nextInt(4);
+			if (chance < 20) {
+				int action = random.nextInt(5);
 				if (action == 0)
 					dir = 1;
 				if (action == 1)
@@ -142,28 +152,29 @@ public class Mob extends Entity {
 					dir = 4;
 				if (action == 3)
 					dir = 3;
+				if (action == 4)
+					dir = 5;
 			}
 		}
 
 		if (dir != 0) {
 
-			if (dir==1)
+			if (dir == 1)
 				ya--;
-			if (dir==2)
+			if (dir == 2)
 				ya++;
-			if (dir==3)
+			if (dir == 3)
 				xa++;
-			if (dir==4)
+			if (dir == 4)
 				xa--;
 
 			int moveSpeed = playerSpeed;
 
-			nextRect = new Rectangle(levelX + solidArea.x + xa * moveSpeed,
-					levelY + solidArea.y + ya * moveSpeed, solidArea.width, solidArea.height);
+			nextRect = new Rectangle(levelX + solidArea.x + xa * moveSpeed, levelY + solidArea.y + ya * moveSpeed,
+					solidArea.width, solidArea.height);
 
 			collisionOn = false;
 			game.cChecker.checkTile(this);
-			game.cChecker.overloadedCheckTile(this, nextRect);
 			game.cChecker.checkEntity(this, game.entities, nextRect);
 
 			if (!collisionOn) {
@@ -173,16 +184,25 @@ public class Mob extends Entity {
 				moveTimer++;
 				if (moveTimer >= moveInterval) {
 					moveTimer = 0;
-					int action = random.nextInt(4);
+					int action = random.nextInt(5);
 					if (action == 0)
-					dir = 1;
-				if (action == 1)
-					dir = 2;
-				if (action == 2)
-					dir = 4;
-				if (action == 3)
-					dir = 3;
+						dir = 1;
+					if (action == 1)
+						dir = 2;
+					if (action == 2)
+						dir = 4;
+					if (action == 3)
+						dir = 3;
+					if (action == 4)
+						dir = 5;
 				}
+			}
+
+			if (levelX < -(playerSize / 2)) {
+				levelX = -(playerSize / 2);
+			}
+			if (levelY < -(playerSize / 2)) {
+				levelY = -(playerSize / 2);
 			}
 
 			spriteCounter++;
@@ -200,25 +220,25 @@ public class Mob extends Entity {
 
 			g.drawImage(image, screenX, screenY, playerSize, playerSize, null);
 
-			if (dir==2) {
+			if (dir == 2) {
 				if (spriteNum == 1)
 					image = playerSprite[0];
 				if (spriteNum == 2)
 					image = playerSprite[1];
 			}
-			if (dir==1) {
+			if (dir == 1) {
 				if (spriteNum == 1)
 					image = playerSprite[2];
 				if (spriteNum == 2)
 					image = playerSprite[3];
 			}
-			if (dir==3) {
+			if (dir == 3) {
 				if (spriteNum == 1)
 					image = playerSprite[4];
 				if (spriteNum == 2)
 					image = playerSprite[5];
 			}
-			if (dir==4) {
+			if (dir == 4) {
 				if (spriteNum == 1)
 					image = playerSprite[6];
 				if (spriteNum == 2)

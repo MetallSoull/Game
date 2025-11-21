@@ -30,4 +30,8 @@ public class Tile {
 	public void tick() {
 		
 	}
+
+	public boolean mayPass() {
+		return !collision;
+	}
 }

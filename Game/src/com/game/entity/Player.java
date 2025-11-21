@@ -5,11 +5,14 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import com.game.gfx.SpriteSheet;
 import com.game.main.Game;
 import com.game.main.KeyHandler;
 import com.game.tile.Tile;
+import com.main.level.Level;
 
 public class Player extends Entity {
 
@@ -41,7 +44,6 @@ public class Player extends Entity {
 
 		getSprites();
 		setDefaultValues();
-		attack();
 	}
 
 	public void getSprites() {
@@ -62,12 +64,16 @@ public class Player extends Entity {
 	}
 
 	public void setDefaultValues() {
-		playerSize = 48;
-		levelX = Tile.tileSize * 20;
-		levelY = Tile.tileSize * 20;
-		playerSpeed = 2;
-		dir = random.nextInt(4) + 1;
+	    playerSpeed = 1;
+	    playerSize = 48;
+	    health = 10;
+
+	    levelX = (game.level.w / 2) * Tile.tileSize - (playerSize / 2);
+	    levelY = (game.level.h / 2) * Tile.tileSize - (playerSize / 2);
+
+	    dir = new Random().nextInt(4) + 1;
 	}
+
 
 	public Rectangle getSolidArea() {
 		return new Rectangle(levelX + solidArea.x, levelY + solidArea.y, solidArea.width, solidArea.height);
@@ -83,7 +89,7 @@ public class Player extends Entity {
 		boolean movingDown = keyH.down;
 		boolean movingLeft = keyH.left;
 		boolean movingRight = keyH.right;
-		boolean attack = keyH.attack;
+		boolean attackO = keyH.attackO;
 		boolean moving = movingUp || movingDown || movingLeft || movingRight;
 
 		xa = 0;
@@ -97,60 +103,47 @@ public class Player extends Entity {
 			dir = 1;
 		else if (ya > 0)
 			dir = 2;
-		else if (attack)
-			action = "attack";
 
 		if (movingLeft) {
 			xa--;
 			moving = true;
 			dir = 4;
-			if (attack) {
-				attackOn = true;
-				action = "attack";
-				attack();
-			}
 		} else if (movingRight) {
 			xa++;
 			moving = true;
 			dir = 3;
-			if (attack) {
-				attackOn = true;
-				action = "attack";
-				attack();
-			}
 		}
 
 		if (movingUp) {
 			ya--;
 			moving = true;
 			dir = 1;
-			if (attack) {
-				attackOn = true;
-				action = "attack";
-				attack();
-			}
 		} else if (movingDown) {
 			ya++;
 			moving = true;
 			dir = 2;
-			if (attack) {
-				attackOn = true;
-				action = "attack";
-				attack();
-			}
 		}
 
+		if (attackCooldown > 0) {
+			attackCooldown--;
+		}
+
+		if (attackO && attackCooldown == 0) {
+			attack();
+			attackCooldown = 50;
+			attackO = false;
+		}
+		/*
+		 * System.out.println("AttackO: " + attackO + " AttackCooldown: " +
+		 * attackCooldown);
+		 */
 		if (moving) {
 			int moveSpeed = playerSpeed;
-			if (xa != 0 && ya != 0) {
-				moveSpeed = playerSpeed;
-			}
 
 			int nextX = levelX + xa * moveSpeed;
 			Rectangle nextRectX = new Rectangle(nextX + solidArea.x, levelY + solidArea.y, solidArea.width,
 					solidArea.height);
 			collisionOn = false;
-			game.cChecker.overloadedCheckTile(this, nextRectX);
 			game.cChecker.checkEntity(this, game.entities, nextRectX);
 			if (!collisionOn) {
 				levelX = nextX;
@@ -160,21 +153,21 @@ public class Player extends Entity {
 			Rectangle nextRectY = new Rectangle(levelX + solidArea.x, nextY + solidArea.y, solidArea.width,
 					solidArea.height);
 			collisionOn = false;
-			game.cChecker.overloadedCheckTile(this, nextRectY);
 			game.cChecker.checkEntity(this, game.entities, nextRectY);
 			if (!collisionOn) {
 				levelY = nextY;
 			}
-			
-			if(levelX < -15) {
-				levelX = -15;
+
+			if (levelX < -(playerSize / 2)) {
+				levelX = -(playerSize / 2);
 			}
-			if(levelY < -15) {
-				levelY = -15;
+
+			if (levelY < -(playerSize / 2)) {
+				levelY = -(playerSize / 2);
 			}
-			
+
 			spriteCounter++;
-			if (spriteCounter % 20 == 0) {
+			if (spriteCounter % 25 == 0) {
 				spriteNum = (spriteNum == 1) ? 2 : 1;
 			}
 		}
@@ -187,8 +180,8 @@ public class Player extends Entity {
 		if (cameraY < 0)
 			cameraY = 0;
 
-		int maxCamX = game.tileM.maxLevelCol * Tile.tileSize - game.WIDTH;
-		int maxCamY = game.tileM.maxLevelRow * Tile.tileSize - game.HEIGHT;
+		int maxCamX = game.level.w * Tile.tileSize - game.WIDTH;
+		int maxCamY = game.level.h * Tile.tileSize - game.HEIGHT;
 
 		if (cameraX > maxCamX)
 			cameraX = maxCamX;
@@ -196,13 +189,55 @@ public class Player extends Entity {
 			cameraY = maxCamY;
 	}
 
-	public int attack() {
-		attackTime++;
-		if (attackTime <= 120) {
-			hurt = new Random().nextInt(5) + 1;
-			attackOn = true;
+	public void attack() {
+
+		Rectangle attackArea = new Rectangle(levelX, levelY, Tile.tileSize, Tile.tileSize);
+
+		switch (dir) {
+		case 1:
+			attackArea.y -= Tile.tileSize;
+			break; // up
+		case 2:
+			attackArea.y += Tile.tileSize;
+			break; // down
+		case 3:
+			attackArea.x += Tile.tileSize;
+			break; // right
+		case 4:
+			attackArea.x -= Tile.tileSize;
+			break; // left
 		}
-		return hurt;
+
+		List<Entity> toRemove = new ArrayList<>();
+
+		for (Entity entity : game.entities) {
+			if (entity != this && attackArea.intersects(entity.getSolidArea())) {
+				entity.hurt(random.nextInt(4) + 1);
+				return;
+			}
+		}
+
+		for (Entity entity : game.entities) {
+			if (entity.dead)
+				toRemove.add(entity);
+		}
+		game.entities.removeAll(toRemove);
+
+		int offsetX = solidArea != null ? solidArea.x : 0;
+		int offsetY = solidArea != null ? solidArea.y : 0;
+
+		int tileCol = (attackArea.x + offsetX) / Tile.tileSize;
+		int tileRow = (attackArea.y + offsetY) / Tile.tileSize;
+
+		if (tileCol >= 0 && tileCol < game.level.w && tileRow >= 0 && tileRow < game.level.h) {
+			int tileNum = game.level.tiles[tileCol][tileRow];
+
+			if (tileNum == Level.TREE) {
+				game.level.tiles[tileCol][tileRow] = Level.GRASS;
+			} else if (tileNum == Level.CACTUS_SMALL || tileNum == Level.CACTUS_LARGE) {
+				game.level.tiles[tileCol][tileRow] = Level.SAND;
+			}
+		}
 	}
 
 	public void render(Graphics g) {

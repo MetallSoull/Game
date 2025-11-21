@@ -15,6 +15,7 @@ public class Entity {
 
 	public int playerSize;
 	public int playerSpeed;
+	public int health;
 
 	public int xa, ya;
 	public int levelX;
@@ -23,10 +24,9 @@ public class Entity {
 	public int mobY;
 	public int mobScreenX, mobScreenY;
 
-	public String action = "";
-	public boolean attackOn;
-	public int hurt;
-	public int attackTime = 0;
+	public long attackTime = 0;
+	public long attackCooldown = 0;
+	public boolean dead = false;
 
 	public int spriteNum = 1;
 	public int spriteCounter = 0;
@@ -37,6 +37,10 @@ public class Entity {
 	public Rectangle solidArea;
 
 	public int dir;
+	
+	public int action;
+	public int detectedEntityOX;
+	public int detectedEntityOY;
 
 	public BufferedImage[] playerSprite = new BufferedImage[8];
 	public BufferedImage[] attackParticle = new BufferedImage[8];
@@ -47,12 +51,32 @@ public class Entity {
 		this.game = game;
 		solidArea = new Rectangle(0, 0, 48, 48);
 	}
-
+	
 	public void tick() {
 
 	}
 
 	public void render(Graphics g) {
 
+	}
+	
+	public Rectangle getSolidArea() {
+	    Rectangle area = new Rectangle(levelX + solidArea.x, levelY + solidArea.y, solidArea.width, solidArea.height);
+	    return area;
+	}
+	
+	public void attack() {
+		
+	}
+	
+	public void hurt(int damage) {
+		health -= damage;
+		if(health <= 0) {
+			die();
+		}
+	}
+	
+	public void die() {
+		
 	}
 }
